@@ -21,3 +21,5 @@ daq_add_application(config_test_rw config_test_rw.cpp         TEST    LINK_LIBRA
 
 # JCF, Oct-18-2022: have yet to handle the creation of pyconfig
 #tdaq_add_library(pyconfig src/python/config.cpp INCLUDE_DIRECTORIES PythonLibs LINK_LIBRARIES PRIVATE config Boost::python)
+
+daq_install()

@@ -1,5 +1,5 @@
-#include "config/SubscriptionCriteria.h"
-#include "config/DalObject.h"
+#include "config/SubscriptionCriteria.hpp"
+#include "config/DalObject.hpp"
 
 void
 ConfigurationSubscriptionCriteria::add(const std::string& class_name)

@@ -5,18 +5,18 @@
 
 #include <dlfcn.h>
 
-#include <ers/ers.h>
-#include <ers/internal/SingletonCreator.h>
+#include "ers/ers.hpp"
+#include "ers/internal/SingletonCreator.hpp"
 
-#include "config/Change.h"
-#include "config/DalObject.h"
-#include "config/DalObjectPrint.h"
-#include "config/DalFactory.h"
-#include "config/ConfigObject.h"
-#include "config/ConfigAction.h"
-#include "config/Configuration.h"
-#include "config/ConfigurationImpl.h"
-#include "config/Schema.h"
+#include "config/Change.hpp"
+#include "config/DalObject.hpp"
+#include "config/DalObjectPrint.hpp"
+#include "config/DalFactory.hpp"
+#include "config/ConfigObject.hpp"
+#include "config/ConfigAction.hpp"
+#include "config/Configuration.hpp"
+#include "config/ConfigurationImpl.hpp"
+#include "config/Schema.hpp"
 
 namespace daq {
 
@@ -164,7 +164,7 @@ Configuration::Configuration(const std::string& spec) :
   if (check_prefetch_needs())
     m_impl->prefetch_all_data();
 
-  ERS_DEBUG(2, "\n*** DUMP CONFIGURATION ***\n" << *this);
+  TLOG_DEBUG(2) << "\n*** DUMP CONFIGURATION ***\n" << *this;
 }
 
 
@@ -343,7 +343,7 @@ Configuration::load(const std::string& db_name)
           m_impl->prefetch_all_data();
         }
 
-      ERS_DEBUG(2, "\n*** DUMP CONFIGURATION ***\n" << *this);
+      TLOG_DEBUG(2) << "\n*** DUMP CONFIGURATION ***\n" << *this;
     }
   else
     {
@@ -566,7 +566,7 @@ Configuration::set_commit_credentials(const std::string& user, const std::string
 void
 Configuration::commit(const std::string& log_message)
 {
-  ERS_DEBUG(1, "call commit");
+  TLOG_DEBUG(1) << "call commit";
 
   if (m_impl == nullptr)
     throw daq::config::Generic( ERS_HERE, "no implementation loaded");
@@ -587,7 +587,7 @@ Configuration::commit(const std::string& log_message)
 void
 Configuration::abort()
 {
-  ERS_DEBUG(1, "call abort");
+  TLOG_DEBUG(1) << "call abort";
 
   if (m_impl == nullptr)
     throw daq::config::Generic( ERS_HERE, "no implementation loaded");
@@ -763,7 +763,7 @@ Configuration::rename_object(ConfigObject& obj, const std::string& new_id)
   obj.m_impl->m_id = new_id;
   m_impl->rename_impl_object(obj.m_impl->m_class_name, old_id, new_id);
 
-  ERS_DEBUG(3, " * call rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << obj.class_name() << "\')");
+  TLOG_DEBUG(3) << " * call rename \'" << old_id << "\' to \'" << new_id << "\' in class \'" << obj.class_name() << "\')";
 
   config::fmap<CacheBase*>::iterator j = m_cache_map.find(&obj.class_name());
   if (j != m_cache_map.end())
@@ -1321,7 +1321,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
               config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
-                  ERS_DEBUG( 2 , "set implementation object " << x << '@' << *class_name << " [" << (void *)j->second << "] deleted");
+                  TLOG_DEBUG( 2 ) << "set implementation object " << x << '@' << *class_name << " [" << (void *)j->second << "] deleted";
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
                   j->second->m_state = daq::config::Deleted;
@@ -1342,7 +1342,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
               config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
-                  ERS_DEBUG( 2 , "re-set created implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']');
+                  TLOG_DEBUG( 2 ) << "re-set created implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']';
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
                   j->second->reset(); // it does not matter what the state was, always reset
@@ -1362,7 +1362,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
               config::map<ConfigObjectImpl *>::iterator j = i->second->find(x);
               if (j != i->second->end())
                 {
-                  ERS_DEBUG(2, "clear implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']');
+                  TLOG_DEBUG(2) << "clear implementation object " << x << '@' << *class_name << " [" << (void *)j->second << ']';
 
                   std::lock_guard<std::mutex> scoped_lock(j->second->m_mutex);
 
@@ -1382,7 +1382,7 @@ Configuration::update_impl_objects(config::pmap<config::map<ConfigObjectImpl *> 
 void
 Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcept
 {
-  ERS_DEBUG(3, "*** Enter Configuration::update_cache() with changes:\n" << changes);
+  TLOG_DEBUG(3) << "*** Enter Configuration::update_cache() with changes:\n" << changes;
 
   // Remove deleted and update modified implementation objects first
   for (const auto& i : changes)
@@ -1417,7 +1417,7 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
 
           if (j != m_cache_map.end())
             {
-              ERS_DEBUG(3, " * call update on \'" << j->first << "\' template objects");
+              TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects";
               j->second->m_functions.m_update_fn(*this, i);
             }
         }
@@ -1436,7 +1436,7 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
 
                   if (j != m_cache_map.end())
                     {
-                      ERS_DEBUG(3, " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')");
+                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as super-class of \'" << *class_name << "\')";
                       j->second->m_functions.m_update_fn(*this, i);
                     }
                 }
@@ -1457,7 +1457,7 @@ Configuration::update_cache(std::vector<ConfigurationChange *>& changes) noexcep
 
                   if (j != m_cache_map.end())
                     {
-                      ERS_DEBUG(3, " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')");
+                      TLOG_DEBUG(3) << " * call update on \'" << j->first << "\' template objects (as sub-class of \'" << *class_name << "\')";
                       j->second->m_functions.m_update_fn(*this, i);
                     }
                 }
@@ -1473,10 +1473,10 @@ void
 Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configuration * conf) noexcept
 {
 
-  ERS_DEBUG(3,
+  TLOG_DEBUG(3) <<
     "*** Enter Configuration::system_cb()\n"
     "*** Number of user subscriptions: " << conf->m_callbacks.size()
-  );
+  ;
 
   // call config actions if any
   {
@@ -1535,14 +1535,14 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
                     text << "  - \"" << i3 << "\"\n";
                 }
 
-              ERS_DEBUG(3, text.str());
+              TLOG_DEBUG(3) << text.str();
             }
 
           if (j->m_criteria.get_classes_subscription().empty() && j->m_criteria.get_objects_subscription().empty())
             {
               try
                 {
-                  ERS_DEBUG(3, "*** Invoke callback " << (void *)j << " with\n" << changes);
+                  TLOG_DEBUG(3) << "*** Invoke callback " << (void *)j << " with\n" << changes;
                   (*(j->m_cb))(changes, j->m_param);
                 }
               catch (const ers::Issue &ex)
@@ -1609,7 +1609,7 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
 
               if (!changes1.empty())
                 {
-                  ERS_DEBUG(3, "*** Invoke callback " << (void *)j << " with\n" << changes1);
+                  TLOG_DEBUG(3) << "*** Invoke callback " << (void *)j << " with\n" << changes1;
 
                   try
                     {
@@ -1635,24 +1635,24 @@ Configuration::system_cb(std::vector<ConfigurationChange *>& changes, Configurat
         }
     }
 
-  ERS_DEBUG(3,"*** Leave Configuration::system_cb()");
+  TLOG_DEBUG(3) <<"*** Leave Configuration::system_cb()";
 }
 
 
 void
 Configuration::system_pre_cb(Configuration * conf) noexcept
 {
-  ERS_DEBUG(3,"*** Enter Configuration::system_pre_cb()");
+  TLOG_DEBUG(3) <<"*** Enter Configuration::system_pre_cb()";
 
   std::lock_guard<std::mutex> scoped_lock(conf->m_else_mutex);
 
   for(auto& j : conf->m_pre_callbacks)
     {
-      ERS_DEBUG(3, "*** Invoke callback " << (void *)(j));
+      TLOG_DEBUG(3) << "*** Invoke callback " << (void *)(j);
       (*(j->m_cb))(j->m_param);
     }
 
-  ERS_DEBUG(3,"*** Leave Configuration::system_pre_cb()");
+  TLOG_DEBUG(3) <<"*** Leave Configuration::system_pre_cb()";
 }
 
 
@@ -1765,7 +1765,7 @@ Configuration::try_cast(const std::string *target, const std::string *source) no
 {
   if (target == source)
     {
-      ERS_DEBUG(2, "cast \'" << *source << "\' => \'" << *target << "\' is allowed (equal classes)");
+      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (equal classes)";
       return true;
     }
 
@@ -1773,17 +1773,17 @@ Configuration::try_cast(const std::string *target, const std::string *source) no
 
   if (i == p_superclasses.end())
     {
-      ERS_DEBUG(2, "cast \'" << *source << "\' => \'" << *target << "\' is not possible (source class is not loaded)");
+      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not possible (source class is not loaded)";
       return false;
     }
 
   if (i->second.find(target) != i->second.end())
     {
-      ERS_DEBUG(2, "cast \'" << *source << "\' => \'" << *target << "\' is allowed (use inheritance)");
+      TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is allowed (use inheritance)";
       return true;
     }
 
-  ERS_DEBUG(2, "cast \'" << *source << "\' => \'" << *target << "\' is not allowed (class \'" << *source << "\' has no \'" << *target << "\' as a superclass)");
+  TLOG_DEBUG(2) << "cast \'" << *source << "\' => \'" << *target << "\' is not allowed (class \'" << *source << "\' has no \'" << *target << "\' as a superclass)";
 
   return false;
 }
@@ -1883,7 +1883,7 @@ DalObject::get_algo_objects(const std::string &name, std::vector<const DalObject
 {
   const std::string &suitable_dal_class = DalFactory::instance().class4algo(p_db, class_name(), name);
 
-  ERS_DEBUG(2, "suitable class for algorithm " << name << " on object " << this << " is " << suitable_dal_class);
+  TLOG_DEBUG(2) << "suitable class for algorithm " << name << " on object " << this << " is " << suitable_dal_class;
 
   if (!suitable_dal_class.empty())
     if (const DalObject *obj = p_db.make_dal_object(const_cast<ConfigObject&>(p_obj), UID(), suitable_dal_class))
@@ -1991,7 +1991,7 @@ DalFactory::functions(const Configuration& db, const std::string& name, bool upc
                   auto sc = m_classes.find(*c);
                   if (sc != m_classes.end())
                     {
-                      ERS_DEBUG(1, "use first suitable base class " << c << " instead of unregistered DAL class " << name);
+                      TLOG_DEBUG(1) << "use first suitable base class " << c << " instead of unregistered DAL class " << name;
                       return sc->second;
                     }
                 }

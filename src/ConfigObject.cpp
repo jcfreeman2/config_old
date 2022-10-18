@@ -1,11 +1,11 @@
 #include <vector>
 #include <iostream>
 
-#include "config/Configuration.h"
-#include "config/ConfigurationImpl.h"
-#include "config/ConfigObject.h"
-#include "config/ConfigObjectImpl.h"
-#include "config/Schema.h"
+#include "config/Configuration.hpp"
+#include "config/ConfigurationImpl.hpp"
+#include "config/ConfigObject.hpp"
+#include "config/ConfigObjectImpl.hpp"
+#include "config/Schema.hpp"
 
 ConfigObject::ConfigObject() noexcept :
   m_impl(nullptr)

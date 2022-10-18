@@ -1,5 +1,5 @@
-#include "config/ConfigObject.h"
-#include "config/ConfigObjectImpl.h"
+#include "config/ConfigObject.hpp"
+#include "config/ConfigObjectImpl.hpp"
 
 class ConfigObjectDefault : public ConfigObjectImpl {
 

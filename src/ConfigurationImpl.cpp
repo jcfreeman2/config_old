@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "config/Configuration.h"
-#include "config/ConfigurationImpl.h"
-#include "config/Schema.h"
+#include "config/Configuration.hpp"
+#include "config/ConfigurationImpl.hpp"
+#include "config/Schema.hpp"
 
 namespace daq {
   namespace config {
@@ -268,7 +268,7 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
 
     if(j != i->second->end()) {
       p_number_of_cache_hits++;
-      ERS_DEBUG(4, "\n  * found the object with id = \'" << id << "\' in class \'" << name << '\'' );
+      TLOG_DEBUG(4) << "\n  * found the object with id = \'" << id << "\' in class \'" << name << '\'' ;
       return j->second;
     }
 
@@ -309,7 +309,7 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
           if(j != i->second->end()) {
             p_number_of_cache_hits++;
   	    CONFIG_ADD_DEBUG_MSG( dbg_text , "  * found the object with id = \'" << id << "\' in class \'" << *k << '\'' )
-            ERS_DEBUG(4, dbg_text->str() );
+	      TLOG_DEBUG(4) << dbg_text->str() ;
             return j->second;
           }
 
@@ -342,7 +342,7 @@ ConfigurationImpl::get_impl_object(const std::string& name, const std::string& i
     CONFIG_ADD_DEBUG_MSG( dbg_text , "  * there is no object \'" << id << "\' in class \'" << name << "\', returning NULL ..." )
   }
 
-  ERS_DEBUG(4, dbg_text->str() );
+  TLOG_DEBUG(4) << dbg_text->str() ;
 
   return nullptr;
 }
@@ -388,7 +388,7 @@ ConfigurationImpl::rename_impl_object(const std::string * class_name, const std:
 
           obj = j->second;
 
-          ERS_DEBUG(2, "rename implementation " << (void *)j->second << " of object \'" << old_id << '@' << *class_name << "\' to \'" << new_id << '\'');
+          TLOG_DEBUG(2) << "rename implementation " << (void *)j->second << " of object \'" << old_id << '@' << *class_name << "\' to \'" << new_id << '\'';
           i->second->erase(j);
         }
     }

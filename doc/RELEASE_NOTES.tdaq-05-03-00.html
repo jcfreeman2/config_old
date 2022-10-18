@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=windows-1252"
+      http-equiv="content-type">
+    <title>RELEASE_NOTES</title>
+    <style>
+<!--
+pre          {  }
+-->
+  </style>
+  </head>
+  <body>
+    <h3 class="prioreclosed">New Methods<br>
+    </h3>
+    <h4>Cast Methods</h4>
+    Implement new template cast method in <i>DalObject</i> C++ class:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>template&lt;class TARGET&gt; const TARGET * cast() const noexcept;</big></font></pre>
+    </blockquote>
+    There is no need to pass configuration pointer. Only template
+    parameter is needed, e.g.:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>daq::core::BaseApplication * base_app = ... // some pointer on base application object<br>if(daq::core::Application * app = base_app-&gt;cast&lt;daq::core::Application&gt;())<br>{<br>&nbsp; std::cout &lt;&lt; app &lt;&lt; " is an application\n";<br>}</big></font></pre>
+    </blockquote>
+    This method should be used instead of obsolete method of <i>Configuration</i>
+    class:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>template&lt;class TARGET, class SOURCE&gt; const TARGET *cast(const SOURCE *s) noexcept;</big></font></pre>
+    </blockquote>
+    since above method requires extra parameter (i.e. configuration
+    object) and usually complicated a code.<br>
+    <br>
+    Similarly, in Java genconfig generates the cast methods containing
+    single parameter referencing DAL object. Old methods requiring two
+    parameters should not be used anymore and marked as deprecated, e.g.
+    see dal/Application_Helper.java:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>@Deprecated<br>static public Application cast(config.Configuration db, config.DalObject obj) {<br>    return cast(obj);<br>}<br><br>/**<br> *&nbsp; Method to casts existing object to object of Application class.<br> *&nbsp; @param obj config object<br> */<br>static public Application cast(config.DalObject obj) {<br>    ...<br>}</big></font></pre>
+    </blockquote>
+    <h4>Add is_writable() Method</h4>
+    To implement feature request <a
+      href="https://savannah.cern.ch/bugs/?90969">90969</a> add C++
+    method:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>bool Configuration::is_writable(const std::string&amp; db_name) const;</big></font></pre>
+    </blockquote>
+    that checks a possibility to update database file by current user
+    (supports files stored on the OKS server repository checking Access
+    Manager permissions).<br>
+    <h4>Add move() Method</h4>
+    To implement feature request <a
+      href="https://savannah.cern.ch/bugs/?97465">97465</a> add C++
+    method:<br>
+    <blockquote>
+      <pre><font color="#000066"><big>void ConfigObject::move(const std::string&amp; at);</big></font><br></pre>
+    </blockquote>
+    that moves config object into a different file.<br>
+    <h3>General</h3>
+    Remove any explicit <i>throw </i>specifications in methods of C++
+    classes, since they are obsolete in C++ 11 standard. The explicit <i>noexcept</i>
+    specification is used, if the method may not throw an exception.
+    Otherwise exception specification is provided in DoxyGen
+    documentation.<br>
+    <br>
+  </body>
+</html>
